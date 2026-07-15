@@ -19,6 +19,18 @@ const appName = import.meta.env.VITE_APP_NAME || 'Finanzas OS';
 
 document.documentElement.classList.add('dark');
 
+const canRegisterServiceWorker =
+    'serviceWorker' in navigator &&
+    (window.location.protocol === 'https:' || ['localhost', '127.0.0.1'].includes(window.location.hostname));
+
+if (canRegisterServiceWorker) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch((error) => {
+            console.error('Service worker registration failed:', error);
+        });
+    });
+}
+
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) => resolvePageComponent(`./Pages/${name}.tsx`, import.meta.glob('./Pages/**/*.tsx')),

@@ -146,7 +146,7 @@ export default function Login({ status, canResetPassword, loginMetrics }: LoginP
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(6,182,212,0.22),transparent_32%),radial-gradient(circle_at_85%_20%,rgba(16,185,129,0.16),transparent_24%),linear-gradient(135deg,#07131b_0%,#081923_45%,#041018_100%)]" />
 
                 <div className="relative grid min-h-screen lg:grid-cols-[1.15fr_0.85fr]">
-                    <section className="flex flex-col justify-between border-b border-white/10 px-5 py-8 sm:px-8 lg:border-b-0 lg:border-r lg:px-10 lg:py-10 xl:px-12">
+                    <section className="hidden border-b border-white/10 px-5 py-8 sm:px-8 lg:flex lg:flex-col lg:justify-between lg:border-b-0 lg:border-r lg:px-10 lg:py-10 xl:px-12">
                         <motion.div
                             initial={{ opacity: 0, y: -16 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -241,13 +241,23 @@ export default function Login({ status, canResetPassword, loginMetrics }: LoginP
                         </motion.div>
                     </section>
 
-                    <section className="flex items-center justify-center px-4 py-8 sm:px-6 lg:px-10">
+                    <section className="flex min-h-screen items-center justify-center px-4 py-8 sm:px-6 lg:px-10">
                         <motion.div
                             initial={{ opacity: 0, x: 24 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.55, delay: 0.14 }}
                             className="w-full max-w-md"
                         >
+                            <div className="mb-6 flex items-center gap-3 lg:hidden">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-300/20 bg-cyan-400/15 shadow-[0_0_40px_rgba(34,211,238,0.18)]">
+                                    <TrendingUp className="h-5 w-5 text-cyan-200" />
+                                </div>
+                                <div>
+                                    <div className="text-lg font-semibold tracking-tight">Finanzas OS</div>
+                                    <div className="text-sm text-slate-300/75">Control multi-tenant financiero</div>
+                                </div>
+                            </div>
+
                             <Card className="overflow-hidden rounded-[2rem] border-white/10 bg-[#10212d]/90 shadow-[0_30px_90px_rgba(2,8,23,0.45)]">
                                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/60 to-transparent" />
 

@@ -33,6 +33,10 @@
 
     html {
         background: #07131b;
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+        touch-action: manipulation;
+        overscroll-behavior: none;
     }
 
     body {
@@ -42,6 +46,19 @@
             radial-gradient(circle at top right, rgba(16, 185, 129, 0.14), transparent 28rem),
             linear-gradient(180deg, rgba(7, 19, 27, 0.98), rgba(10, 24, 35, 1)),
             #07131b;
+        overscroll-behavior: none;
+        -webkit-tap-highlight-color: transparent;
+        padding-top: env(safe-area-inset-top);
+        padding-right: env(safe-area-inset-right);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+        font-size: 16px;
     }
 }
 
