@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ClientWelcomeMail;
 use App\Http\Controllers\Concerns\InteractsWithTenant;
 use App\Models\Client;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -32,8 +34,9 @@ class ClientController extends Controller
         abort_unless($this->isSuperAdmin($request), 403);
 
         $data = $this->validated($request);
+        $plainPassword = $data['admin_password'];
 
-        DB::transaction(function () use ($data, $request): void {
+        ['client' => $client, 'admin' => $admin] = DB::transaction(function () use ($data, $request): array {
             $client = Client::create($this->clientData($data));
 
             $admin = User::create([
@@ -48,9 +51,28 @@ class ClientController extends Controller
             ]);
 
             $admin->syncRoles(['admin']);
+
+            return [
+                'client' => $client,
+                'admin' => $admin,
+            ];
         });
 
-        return back()->with('success', 'Cliente y usuario administrador creados.');
+        $mailSent = true;
+
+        try {
+            Mail::to($admin->email)->send(new ClientWelcomeMail($client, $admin, $plainPassword));
+        } catch (\Throwable $exception) {
+            report($exception);
+            $mailSent = false;
+        }
+
+        return back()->with(
+            'success',
+            $mailSent
+                ? 'Cliente y usuario administrador creados. Correo de bienvenida enviado.'
+                : 'Cliente y usuario administrador creados. No se pudo enviar el correo de bienvenida.',
+        );
     }
 
     public function update(Request $request, Client $client)
