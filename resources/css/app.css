@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        color-scheme: dark;
+        --background: 204 43% 7%;
+        --foreground: 210 40% 96%;
+        --card: 205 34% 11%;
+        --card-foreground: 0 0% 100%;
+        --popover: 205 34% 11%;
+        --popover-foreground: 0 0% 100%;
+        --primary: 196 84% 46%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 201 44% 18%;
+        --secondary-foreground: 0 0% 100%;
+        --muted: 206 23% 18%;
+        --muted-foreground: 210 18% 72%;
+        --accent: 153 60% 45%;
+        --accent-foreground: 210 40% 98%;
+        --destructive: 0 68% 54%;
+        --destructive-foreground: 0 0% 100%;
+        --border: 0 0% 100% / 0.08;
+        --input: 0 0% 100% / 0.08;
+        --ring: 196 84% 46%;
+        --radius: 0.65rem;
+    }
+
+    * {
+        @apply border-border;
+    }
+
+    html {
+        background: #07131b;
+    }
+
+    body {
+        @apply bg-background text-foreground antialiased;
+        background:
+            radial-gradient(circle at top left, rgba(14, 165, 233, 0.22), transparent 32rem),
+            radial-gradient(circle at top right, rgba(16, 185, 129, 0.14), transparent 28rem),
+            linear-gradient(180deg, rgba(7, 19, 27, 0.98), rgba(10, 24, 35, 1)),
+            #07131b;
+    }
+}
+
+@layer components {
+    .brand-card {
+        @apply border border-white/10 bg-[#10212d]/85 shadow-xl shadow-black/30 backdrop-blur;
+    }
+
+    .brand-button {
+        @apply bg-gradient-to-r from-[#0891b2] to-[#10b981] text-white shadow-lg shadow-[#0891b2]/20 hover:from-[#06b6d4] hover:to-[#34d399];
+    }
+}
+
+.react-phone-container {
+    width: 100% !important;
+}
+
+.react-phone-input {
+    width: 100% !important;
+    height: 2.75rem !important;
+    border-radius: 0.5rem !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: white !important;
+    padding-left: 3rem !important;
+}
+
+.react-phone-input:focus {
+    border-color: rgb(6 182 212 / 0.9) !important;
+    box-shadow: 0 0 0 1px rgb(6 182 212 / 0.9) !important;
+}
+
+.react-phone-flag-button {
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-right: 0 !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border-radius: 0.5rem 0 0 0.5rem !important;
+}
+
+.react-phone-dropdown {
+    background: #10212d !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+}
+
+.react-phone-dropdown .country,
+.react-phone-dropdown .search {
+    background: #10212d !important;
+    color: white !important;
+}
+
+.react-phone-dropdown .country.highlight,
+.react-phone-dropdown .country:hover {
+    background: rgba(6, 182, 212, 0.18) !important;
+}
+
+.react-phone-dropdown .search-box {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+}
