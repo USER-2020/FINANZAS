@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import { BarChart3, Bell, BriefcaseBusiness, Building2, ChevronUp, LayoutDashboard, LogOut, Menu, Package, Settings, ShieldCheck, UserCircle, Users, WalletCards, Warehouse } from 'lucide-react';
+import { BarChart3, Bell, BriefcaseBusiness, Building2, ChevronUp, Clapperboard, LayoutDashboard, LogOut, Menu, Package, Settings, ShieldCheck, UserCircle, Users, WalletCards, Warehouse } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Avatar, AvatarFallback } from '@/Components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu';
@@ -19,6 +19,7 @@ const iconMap = {
     Warehouse,
     Building2,
     BarChart3,
+    Clapperboard,
 } as const;
 
 function SidebarContent({ user }: { user: User }) {

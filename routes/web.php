@@ -10,6 +10,8 @@ use App\Http\Controllers\InventoryItemController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\SuperAdminVideoController;
 use App\Http\Controllers\UserController;
 use App\Models\FinancialMovement;
 use App\Models\InventoryItem;
@@ -44,6 +46,9 @@ Route::get('/', function () {
         'status' => session('status'),
     ]);
 });
+
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+Route::get('/videos/share/{video}', [SuperAdminVideoController::class, 'showPublic'])->name('videos.share.show');
 
 Route::get('/dashboard', function (Request $request) {
     $user = Auth::user();
@@ -278,6 +283,7 @@ Route::get('/dashboard', function (Request $request) {
 
 Route::middleware(['auth', 'active', 'menu'])->group(function () {
     Route::resource('clients', ClientController::class)->except(['create', 'show', 'edit']);
+    Route::get('admin-videos', [SuperAdminVideoController::class, 'index'])->name('admin-videos.index');
     Route::get('module-access', [AdminModuleAccessController::class, 'index'])->name('module-access.index');
     Route::put('module-access/{user}', [AdminModuleAccessController::class, 'update'])->name('module-access.update');
     Route::post('departments/import-templates', [DepartmentController::class, 'importTemplates'])->name('departments.import-templates');

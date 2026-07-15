@@ -33,6 +33,14 @@ const currencyFormatter = new Intl.NumberFormat('es-CO', {
 });
 
 const numberFormatter = new Intl.NumberFormat('es-CO');
+const desktopShowcaseVideoUrl = (import.meta.env.VITE_LOGIN_SHOWCASE_VIDEO_URL_DESKTOP as string | undefined)?.trim()
+    || (import.meta.env.VITE_LOGIN_SHOWCASE_VIDEO_URL as string | undefined)?.trim()
+    || (import.meta.env.VITE_ADMIN_ONBOARDING_VIDEO_URL as string | undefined)?.trim()
+    || '';
+const mobileShowcaseVideoUrl = (import.meta.env.VITE_LOGIN_SHOWCASE_VIDEO_URL_MOBILE as string | undefined)?.trim()
+    || (import.meta.env.VITE_LOGIN_SHOWCASE_VIDEO_URL as string | undefined)?.trim()
+    || (import.meta.env.VITE_ADMIN_ONBOARDING_VIDEO_URL as string | undefined)?.trim()
+    || '';
 
 function AnimatedValue({
     value,
@@ -68,7 +76,7 @@ function AnimatedValue({
         frame = window.requestAnimationFrame(tick);
 
         return () => window.cancelAnimationFrame(frame);
-    }, [duration, value]);
+    }, [displayValue, duration, value]);
 
     return <>{format(displayValue)}</>;
 }
@@ -138,15 +146,48 @@ export default function Login({ status, canResetPassword, loginMetrics }: LoginP
         },
     ];
 
+    const hasDesktopShowcaseVideo = desktopShowcaseVideoUrl.length > 0;
+    const hasMobileShowcaseVideo = mobileShowcaseVideoUrl.length > 0;
+
     return (
         <main className="min-h-screen overflow-hidden bg-[#061119] text-white">
             <Head title="Iniciar sesion" />
 
             <div className="relative min-h-screen">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(6,182,212,0.22),transparent_32%),radial-gradient(circle_at_85%_20%,rgba(16,185,129,0.16),transparent_24%),linear-gradient(135deg,#07131b_0%,#081923_45%,#041018_100%)]" />
+                {hasDesktopShowcaseVideo && (
+                    <div className="pointer-events-none absolute inset-0 hidden overflow-hidden opacity-[0.86] lg:block">
+                        <video
+                            src={desktopShowcaseVideoUrl}
+                            className="h-full w-full object-cover"
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            preload="metadata"
+                        />
+                    </div>
+                )}
 
-                <div className="relative grid min-h-screen lg:grid-cols-[1.15fr_0.85fr]">
-                    <section className="hidden border-b border-white/10 px-5 py-8 sm:px-8 lg:flex lg:flex-col lg:justify-between lg:border-b-0 lg:border-r lg:px-10 lg:py-10 xl:px-12">
+                {hasMobileShowcaseVideo && (
+                    <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.88] lg:hidden">
+                        <video
+                            src={mobileShowcaseVideoUrl}
+                            className="h-full w-full object-cover"
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            preload="metadata"
+                        />
+                    </div>
+                )}
+
+                <div className="absolute inset-0 bg-[#02070d]/54" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(6,182,212,0.16),transparent_30%),radial-gradient(circle_at_85%_20%,rgba(16,185,129,0.12),transparent_24%),linear-gradient(135deg,rgba(7,19,27,0.68)_0%,rgba(8,25,35,0.76)_45%,rgba(4,16,24,0.86)_100%)]" />
+                <div className="absolute inset-0 backdrop-blur-[4px]" />
+
+                <div className="relative z-10 grid min-h-screen lg:grid-cols-[1.15fr_0.85fr]">
+                    <section className="hidden border-b border-white/10 px-5 py-8 sm:px-8 lg:flex lg:flex-col lg:justify-between lg:border-b-0 lg:border-r lg:border-white/8 lg:px-10 lg:py-10 xl:px-12">
                         <motion.div
                             initial={{ opacity: 0, y: -16 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -178,7 +219,7 @@ export default function Login({ status, canResetPassword, loginMetrics }: LoginP
                                 transition={{ duration: 0.6, delay: 0.14 }}
                                 className="mt-5 max-w-4xl text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl xl:text-6xl"
                             >
-                                Administra clientes, usuarios y flujo operativo desde un unico panel.
+                                Convierte cada acceso en una vista clara del negocio, con el producto vivo detras de la experiencia.
                             </motion.h1>
 
                             <motion.p
@@ -187,15 +228,15 @@ export default function Login({ status, canResetPassword, loginMetrics }: LoginP
                                 transition={{ duration: 0.6, delay: 0.2 }}
                                 className="mt-6 max-w-2xl text-base leading-8 text-slate-300/80 sm:text-lg"
                             >
-                                Tus indicadores de acceso ahora se alimentan con datos globales reales de la plataforma:
-                                clientes, usuarios, departamentos y movimientos consolidados en tiempo real.
+                                El login ahora presenta la plataforma con video inmersivo de fondo y metricas globales reales
+                                para reforzar confianza, contexto operativo y valor desde el primer segundo.
                             </motion.p>
 
                             <motion.div
                                 initial={{ opacity: 0, y: 24 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.6, delay: 0.26 }}
-                                className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+                                className="mt-10 grid gap-6 sm:grid-cols-2 xl:gap-7"
                             >
                                 {highlights.map((item, index) => (
                                     <motion.div
@@ -203,7 +244,7 @@ export default function Login({ status, canResetPassword, loginMetrics }: LoginP
                                         initial={{ opacity: 0, y: 18 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ duration: 0.45, delay: 0.32 + index * 0.08 }}
-                                        className="group rounded-3xl border border-white/10 bg-white/[0.045] p-5 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300/25 hover:bg-white/[0.065]"
+                                        className="group flex min-h-[208px] flex-col rounded-3xl border border-white/10 bg-white/[0.045] p-7 backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:border-cyan-300/25 hover:bg-white/[0.065] xl:p-8"
                                     >
                                         <div className="flex items-center justify-between">
                                             <div className="rounded-2xl border border-cyan-300/15 bg-cyan-400/10 p-3 text-cyan-200">
@@ -211,11 +252,11 @@ export default function Login({ status, canResetPassword, loginMetrics }: LoginP
                                             </div>
                                             <span className="text-xs uppercase tracking-[0.25em] text-slate-400">Live</span>
                                         </div>
-                                        <div className="mt-5 text-sm text-slate-300/80">{item.label}</div>
-                                        <div className="mt-2 text-3xl font-semibold tracking-tight text-white">
+                                        <div className="mt-7 text-sm text-slate-300/80">{item.label}</div>
+                                        <div className="mt-3 text-3xl font-semibold tracking-tight text-white">
                                             <AnimatedValue value={item.value} />
                                         </div>
-                                        <div className="mt-1 text-sm text-slate-400">{item.helper}</div>
+                                        <div className="mt-auto pt-5 text-sm text-slate-400">{item.helper}</div>
                                     </motion.div>
                                 ))}
                             </motion.div>
@@ -225,15 +266,15 @@ export default function Login({ status, canResetPassword, loginMetrics }: LoginP
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.55, delay: 0.38 }}
-                            className="grid gap-4 md:grid-cols-3"
+                            className="grid gap-6 md:grid-cols-3 xl:gap-7"
                         >
                             {monthlyCards.map((item, index) => (
                                 <div
                                     key={item.label}
-                                    className="rounded-3xl border border-white/10 bg-[#0d1d28]/85 p-5 shadow-[0_24px_60px_rgba(2,8,23,0.32)]"
+                                    className="rounded-3xl border border-white/10 bg-[#0d1d28]/78 px-7 py-6 shadow-[0_24px_60px_rgba(2,8,23,0.32)] backdrop-blur-md xl:px-8 xl:py-7 mt-8"
                                 >
                                     <div className="text-sm text-slate-400">{item.label}</div>
-                                    <div className={`mt-2 text-2xl font-semibold tracking-tight ${item.tone}`}>
+                                    <div className={`mt-3 text-2xl font-semibold tracking-tight ${item.tone}`}>
                                         <AnimatedValue value={item.value} format={(value) => currencyFormatter.format(value)} duration={1100 + index * 120} />
                                     </div>
                                 </div>
@@ -246,7 +287,7 @@ export default function Login({ status, canResetPassword, loginMetrics }: LoginP
                             initial={{ opacity: 0, x: 24 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.55, delay: 0.14 }}
-                            className="w-full max-w-md"
+                            className="w-full max-w-md lg:max-w-lg"
                         >
                             <div className="mb-6 flex items-center gap-3 lg:hidden">
                                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-300/20 bg-cyan-400/15 shadow-[0_0_40px_rgba(34,211,238,0.18)]">
@@ -258,29 +299,29 @@ export default function Login({ status, canResetPassword, loginMetrics }: LoginP
                                 </div>
                             </div>
 
-                            <Card className="overflow-hidden rounded-[2rem] border-white/10 bg-[#10212d]/90 shadow-[0_30px_90px_rgba(2,8,23,0.45)]">
+                            <Card className="overflow-hidden rounded-[2rem] border-white/10 bg-[#10212d]/84 shadow-[0_30px_90px_rgba(2,8,23,0.45)] backdrop-blur-xl">
                                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/60 to-transparent" />
 
-                                <CardHeader className="space-y-4 pb-4">
+                                <CardHeader className="space-y-5 px-7 pb-5 pt-7 sm:px-8 sm:pt-8">
                                     <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-300/20 bg-cyan-400/10">
                                         <LockKeyhole className="h-6 w-6 text-cyan-200" />
                                     </div>
                                     <div>
                                         <CardTitle className="text-3xl tracking-tight text-white">Iniciar sesion</CardTitle>
                                         <CardDescription className="mt-2 text-base text-slate-300/75">
-                                            Accede al panel financiero y operativo con control por usuario.
+                                            Accede al panel financiero y operativo con una interfaz mas inmersiva y enfocada.
                                         </CardDescription>
                                     </div>
                                 </CardHeader>
 
-                                <CardContent>
+                                <CardContent className="px-7 pb-7 sm:px-8 sm:pb-8">
                                     {status && (
                                         <div className="mb-5 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200">
                                             {status}
                                         </div>
                                     )}
 
-                                    <form onSubmit={submit} className="space-y-5">
+                                    <form onSubmit={submit} className="space-y-6">
                                         <div className="space-y-2">
                                             <label htmlFor="email" className="text-sm font-medium text-white">
                                                 Email

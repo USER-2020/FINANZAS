@@ -4,6 +4,7 @@ import { type ColumnDef } from '@tanstack/react-table';
 import { AlertTriangle, ArrowDownRight, ArrowUpRight, Building2, Package, ShieldCheck, Users, WalletCards } from 'lucide-react';
 import { Bar, BarChart, Line, LineChart, ResponsiveContainer, Tooltip as ChartTooltip, XAxis, YAxis } from 'recharts';
 import { AppLayout } from '@/Components/layout/AppLayout';
+import { AdminWorkflowGuide } from '@/Components/dashboard/AdminWorkflowGuide';
 import { FinancialCard } from '@/Components/dashboard/FinancialCard';
 import { BudgetProgress } from '@/Components/dashboard/BudgetProgress';
 import { DataTable } from '@/Components/data-table/DataTable';
@@ -158,6 +159,8 @@ export default function Dashboard({
     superAdminMetrics?: SuperAdminMetrics;
     filters?: DashboardFilters;
 }>) {
+    const isAdmin = auth.user.roles?.some((role) => role.name === 'admin') ?? false;
+
     if (isSuperAdmin && superAdminMetrics) {
         return (
             <AppLayout user={auth.user}>
@@ -257,6 +260,18 @@ export default function Dashboard({
                         </Button>
                     }
                 />
+
+                {isAdmin && (
+                    <>
+                        <AdminWorkflowGuide
+                            departmentsCount={departments.length}
+                            latestMovementsCount={latestMovements.length}
+                            pendingPurchasesCount={pendingPurchasesCount}
+                            lowInventoryCount={lowInventoryCount}
+                            canManageUsers={Boolean(auth.user.roles?.some((role) => role.name === 'admin'))}
+                        />
+                    </>
+                )}
 
                 <DataTableFilters>
                     <div className="space-y-2">

@@ -5,6 +5,7 @@ return [
         ['key' => 'dashboard', 'label' => 'Dashboard', 'href' => '/dashboard', 'icon' => 'LayoutDashboard'],
         ['key' => 'clients', 'label' => 'Clientes', 'href' => '/clients', 'icon' => 'BriefcaseBusiness'],
         ['key' => 'users', 'label' => 'Usuarios', 'href' => '/users', 'icon' => 'Users'],
+        ['key' => 'admin-videos', 'label' => 'Videos', 'href' => '/admin-videos', 'icon' => 'Clapperboard'],
         ['key' => 'module-access', 'label' => 'Accesos', 'href' => '/module-access', 'icon' => 'ShieldCheck'],
     ],
     'tenant' => [

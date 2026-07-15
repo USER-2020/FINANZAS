@@ -17,6 +17,7 @@
 
 /.idea
 /.vscode
+/hyperframes-workspace
 
 /npm-debug.log
 /yarn-debug.log
