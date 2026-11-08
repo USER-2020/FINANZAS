@@ -43,6 +43,9 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn () => $request->session()->get('error'),
                 'status' => fn () => $request->session()->get('status'),
             ],
+            'tourCompletions' => fn () => $request->user()
+                ? $request->user()->tourCompletions()->get(['tour_key', 'version', 'completed_at'])
+                : [],
         ];
     }
 }

@@ -138,5 +138,6 @@ return [
         'period_end' => 'fin del período',
         'generated_by' => 'generado por',
         'file_path' => 'archivo',
+        'file' => 'factura',
     ],
 ];

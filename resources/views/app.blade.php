@@ -5,10 +5,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
         @php
             $appName = config('app.name', 'Finanzas OS');
-            $seoTitle = $appName . ' | Plataforma financiera multi-tenant para clientes, usuarios y operación';
-            $seoDescription = 'Finanzas OS centraliza clientes, usuarios, departamentos, presupuestos, compras, inventario, reportes y movimientos financieros en una plataforma multi-tenant en español.';
-            $seoKeywords = 'finanzas os, plataforma financiera, multi-tenant, clientes, usuarios, presupuestos, compras, inventario, reportes, software financiero, saas financiero, control financiero';
-            $seoImage = asset('pwa/og-image.png');
+            $seoTitle = $appName . ' | Ordena tu dinero y toma mejores decisiones';
+            $seoDescription = 'Finanzas OS te ayuda a registrar movimientos, organizar gastos, controlar presupuestos y avanzar hacia tus metas de ahorro desde un solo lugar.';
+            $seoKeywords = 'finanzas personales, control de gastos, presupuesto personal, metas de ahorro, movimientos financieros, Finanzas OS, dinero, ahorro';
+            $assetVersion = '2026.11.07.2';
+            $seoImage = asset('pwa/og-image.png').'?v='.$assetVersion;
             $currentUrl = url()->current();
             $geoRegion = 'CO-DC';
             $geoPlacename = 'Bogotá, Colombia';
@@ -50,10 +51,10 @@
                             'priceCurrency' => 'COP',
                         ],
                         'featureList' => [
-                            'Gestión multi-tenant por cliente',
-                            'Control de usuarios, roles y permisos',
-                            'Movimientos financieros, compras e inventario',
-                            'Reportes y operación financiera centralizada',
+                            'Registro inteligente de ingresos y gastos',
+                            'Presupuestos y categorías personales',
+                            'Metas de ahorro y movimientos recurrentes',
+                            'Lectura de facturas con OCR',
                         ],
                         'publisher' => [
                             '@id' => config('app.url') . '#organization',
@@ -62,7 +63,8 @@
                 ],
             ];
         @endphp
-        <meta name="theme-color" content="#07131b">
+        <meta name="theme-color" content="#06111f">
+        <meta name="msapplication-TileColor" content="#06111f">
         <meta name="description" content="{{ $seoDescription }}">
         <meta name="keywords" content="{{ $seoKeywords }}">
         <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
@@ -107,12 +109,17 @@
         <link rel="alternate" hreflang="es-co" href="{{ $currentUrl }}">
         <link rel="alternate" hreflang="x-default" href="{{ $currentUrl }}">
         <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
-        <link rel="manifest" href="{{ asset('build/manifest.webmanifest') }}">
-        <link rel="apple-touch-icon" href="{{ asset('pwa/icon-192.svg') }}">
+        <link rel="icon" type="image/png" sizes="64x64" href="{{ asset('favicon.png') }}">
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+        @if (file_exists(public_path('build/manifest.webmanifest')))
+            <link rel="manifest" href="{{ asset('build/manifest.webmanifest') }}">
+        @endif
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('pwa/apple-touch-icon.png') }}">
         <script type="application/ld+json">{!! json_encode($structuredData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
 
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
         @routes
         @viteReactRefresh

@@ -1,8 +1,8 @@
-const STATIC_CACHE = 'finanzasos-static-v1';
+const STATIC_CACHE = 'finanzasos-static-v2';
 const PAGE_CACHE = 'finanzasos-pages-v1';
 const RUNTIME_CACHE = 'finanzasos-runtime-v1';
 
-const APP_SHELL = ['/', '/offline.html', '/favicon.svg', '/pwa/icon-192.svg', '/pwa/icon-512.svg', '/pwa/icon-maskable.svg'];
+const APP_SHELL = ['/', '/offline.html', '/favicon.svg', '/favicon.png', '/favicon.ico', '/pwa/icon-192.png', '/pwa/icon-512.png', '/pwa/icon-maskable.png', '/pwa/apple-touch-icon.png'];
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
@@ -55,7 +55,9 @@ self.addEventListener('fetch', (event) => {
     const isStaticAsset =
         url.pathname.startsWith('/build/') ||
         url.pathname.startsWith('/pwa/') ||
-        url.pathname === '/favicon.svg';
+        url.pathname === '/favicon.svg' ||
+        url.pathname === '/favicon.png' ||
+        url.pathname === '/favicon.ico';
 
     if (isStaticAsset) {
         event.respondWith(

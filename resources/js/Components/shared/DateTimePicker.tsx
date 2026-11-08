@@ -44,7 +44,7 @@ export function DateTimePicker({ value, onChange, placeholder = 'Seleccionar fec
             </PopoverTrigger>
             <PopoverContent className="w-auto p-4" align="start">
                 <div className="space-y-4">
-                    <Calendar mode="single" selected={selectedDate ?? undefined} onSelect={handleDateSelect} />
+                    <Calendar locale={es} mode="single" selected={selectedDate ?? undefined} onSelect={handleDateSelect} />
                 </div>
             </PopoverContent>
         </Popover>

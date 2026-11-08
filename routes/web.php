@@ -13,10 +13,20 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SuperAdminVideoController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PersonalCategoryController;
+use App\Http\Controllers\PersonalBudgetController;
+use App\Http\Controllers\SavingsGoalController;
+use App\Http\Controllers\RecurringTransactionController;
+use App\Http\Controllers\DriverTourController;
+use App\Http\Controllers\InvoiceScanController;
 use App\Models\FinancialMovement;
 use App\Models\InventoryItem;
 use App\Models\Purchase;
 use App\Models\User;
+use App\Models\PersonalBudget;
+use App\Models\PersonalCategory;
+use App\Models\SavingsGoal;
+use App\Models\RecurringTransaction;
 use App\Support\LoginMetrics;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -158,7 +168,27 @@ Route::get('/dashboard', function (Request $request) {
         ->where('user_id', $userId)
         ->whereColumn('quantity', '<=', 'minimum_stock')
         ->count();
-    $totalBudget = (float) Department::query()->where('client_id', $clientId)->sum('monthly_budget');
+    $activeBudgets = PersonalBudget::query()
+        ->where('client_id', $clientId)
+        ->where('user_id', $userId)
+        ->where('status', 'Activo')
+        ->whereDate('start_date', '<=', now()->toDateString())
+        ->where(function ($query) {
+            $query->whereNull('end_date')->orWhereDate('end_date', '>=', now()->toDateString());
+        });
+    $totalBudget = (float) (clone $activeBudgets)->sum('amount');
+    $budgetCategoryIds = (clone $activeBudgets)->whereNotNull('category_id')->pluck('category_id');
+    $budgetSpent = (float) $applyDateRange(
+        (clone $movementsQuery)->where('type', 'Gasto')->when($budgetCategoryIds->isNotEmpty(), fn ($query) => $query->whereIn('category_id', $budgetCategoryIds)),
+        'movement_date',
+    )->sum('amount');
+    $goalStats = SavingsGoal::query()
+        ->where('client_id', $clientId)
+        ->where('user_id', $userId)
+        ->whereIn('status', ['Activa', 'Completada'])
+        ->selectRaw('COALESCE(SUM(current_amount), 0) as current_amount, COALESCE(SUM(target_amount), 0) as target_amount')
+        ->first();
+    $recurringCount = RecurringTransaction::query()->where('client_id', $clientId)->where('user_id', $userId)->where('status', 'Activo')->count();
 
     if ($period === 'all') {
         $chartStart = now()->startOfMonth()->subMonths(5);
@@ -212,11 +242,12 @@ Route::get('/dashboard', function (Request $request) {
         $cursor = $chartBucket === 'month' ? $cursor->addMonth() : $cursor->addDay();
     }
 
-    $sectors = Department::query()
-        ->where('departments.client_id', $clientId)
+    $sectors = PersonalCategory::query()
+        ->where('personal_categories.client_id', $clientId)
+        ->where('personal_categories.user_id', $userId)
         ->leftJoin('financial_movements', function ($join) use ($rangeStart, $rangeEnd) {
-            $join->on('departments.id', '=', 'financial_movements.department_id')
-                ->whereColumn('financial_movements.client_id', 'departments.client_id')
+            $join->on('personal_categories.id', '=', 'financial_movements.category_id')
+                ->whereColumn('financial_movements.client_id', 'personal_categories.client_id')
                 ->where('financial_movements.user_id', Auth::id())
                 ->where('financial_movements.type', 'Gasto');
 
@@ -228,9 +259,9 @@ Route::get('/dashboard', function (Request $request) {
                 $join->where('financial_movements.movement_date', '<=', $rangeEnd->toDateString());
             }
         })
-        ->select('departments.name')
+        ->select('personal_categories.name')
         ->selectRaw('COALESCE(SUM(financial_movements.amount), 0) as value')
-        ->groupBy('departments.id', 'departments.name')
+        ->groupBy('personal_categories.id', 'personal_categories.name')
         ->havingRaw('value > 0')
         ->orderByDesc('value')
         ->limit(6)
@@ -239,12 +270,12 @@ Route::get('/dashboard', function (Request $request) {
     $latestMovements = FinancialMovement::query()
         ->where('client_id', $clientId)
         ->where('user_id', $userId)
-        ->with('department:id,name')
+        ->with(['department:id,name', 'category:id,name'])
         ->when($rangeStart, fn ($query) => $query->where('movement_date', '>=', $rangeStart->toDateString()))
         ->when($rangeEnd, fn ($query) => $query->where('movement_date', '<=', $rangeEnd->toDateString()))
         ->latest('movement_date')
         ->limit(8)
-        ->get(['id', 'department_id', 'concept', 'amount', 'status', 'movement_date']);
+        ->get(['id', 'department_id', 'category_id', 'concept', 'amount', 'status', 'movement_date']);
 
     return Inertia::render('Dashboard', [
         'metrics' => [
@@ -255,6 +286,10 @@ Route::get('/dashboard', function (Request $request) {
             'pendingPurchasesCount' => $pendingPurchasesCount,
             'netFlow' => $periodIncome - $periodExpenses,
             'totalBudget' => $totalBudget,
+            'budgetSpent' => $budgetSpent,
+            'goalsCurrent' => (float) ($goalStats->current_amount ?? 0),
+            'goalsTarget' => (float) ($goalStats->target_amount ?? 0),
+            'recurringCount' => $recurringCount,
             'lowInventoryCount' => $lowInventoryCount,
         ],
         'cashFlow' => $cashFlow,
@@ -282,6 +317,8 @@ Route::get('/dashboard', function (Request $request) {
 })->middleware(['auth', 'active', 'menu', 'verified'])->name('dashboard');
 
 Route::middleware(['auth', 'active', 'menu'])->group(function () {
+    Route::post('driver-tours/{tourKey}/complete', [DriverTourController::class, 'complete'])->name('driver-tours.complete');
+    Route::post('api/invoices/scan', [InvoiceScanController::class, 'scan'])->middleware('throttle:6,1')->name('invoices.scan');
     Route::resource('clients', ClientController::class)->except(['create', 'show', 'edit']);
     Route::get('admin-videos', [SuperAdminVideoController::class, 'index'])->name('admin-videos.index');
     Route::get('module-access', [AdminModuleAccessController::class, 'index'])->name('module-access.index');
@@ -289,9 +326,16 @@ Route::middleware(['auth', 'active', 'menu'])->group(function () {
     Route::post('departments/import-templates', [DepartmentController::class, 'importTemplates'])->name('departments.import-templates');
     Route::resource('departments', DepartmentController::class)->except(['create', 'show', 'edit']);
     Route::resource('financial-movements', FinancialMovementController::class)->except(['create', 'show', 'edit']);
+    Route::get('financial-movements/{financialMovement}/image', [FinancialMovementController::class, 'image'])->name('financial-movements.image');
+    Route::resource('categories', PersonalCategoryController::class)->parameters(['categories' => 'category'])->except(['create', 'show', 'edit']);
+    Route::resource('budgets', PersonalBudgetController::class)->parameters(['budgets' => 'budget'])->except(['create', 'show', 'edit']);
+    Route::resource('savings-goals', SavingsGoalController::class)->parameters(['savings-goals' => 'savingsGoal'])->except(['create', 'show', 'edit']);
+    Route::resource('recurring-transactions', RecurringTransactionController::class)->parameters(['recurring-transactions' => 'recurringTransaction'])->except(['create', 'show', 'edit']);
     Route::resource('purchases', PurchaseController::class)->except(['create', 'show', 'edit']);
     Route::resource('inventory-items', InventoryItemController::class)->except(['create', 'show', 'edit']);
+    Route::get('inventory-items/{inventoryItem}/image', [InventoryItemController::class, 'image'])->name('inventory-items.image');
     Route::resource('reports', ReportController::class)->except(['create', 'show', 'edit']);
+    Route::get('cash-counter', fn () => Inertia::render('CashCounter'))->name('cash-counter');
     Route::resource('users', UserController::class)->except(['create', 'show', 'edit']);
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             RolesAndUsersSeeder::class,
             DepartmentsSeeder::class,
             PaymentMethodsSeeder::class,
+            PersonalFinanceSeeder::class,
         ]);
     }
 }

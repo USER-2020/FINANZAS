@@ -31,4 +31,9 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'paddleocr' => [
+        'url' => env('OCR_API_URL', 'https://ocr.finantechapp.online'),
+        'key' => env('OCR_API_KEY'),
+    ],
+
 ];

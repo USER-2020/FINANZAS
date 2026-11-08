@@ -37,7 +37,7 @@ class InventoryItem extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-        return $this->image_path ? Storage::disk('public')->url($this->image_path) : null;
+        return $this->image_path ? route('inventory-items.image', $this->getKey()) : null;
     }
 
     public function department(): BelongsTo
