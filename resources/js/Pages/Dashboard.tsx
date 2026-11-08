@@ -1,10 +1,10 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { type ColumnDef } from '@tanstack/react-table';
 import { AlertTriangle, ArrowDownRight, ArrowUpRight, Building2, Package, ShieldCheck, Users, WalletCards } from 'lucide-react';
 import { Bar, BarChart, Line, LineChart, ResponsiveContainer, Tooltip as ChartTooltip, XAxis, YAxis } from 'recharts';
 import { AppLayout } from '@/Components/layout/AppLayout';
-import { AdminWorkflowGuide } from '@/Components/dashboard/AdminWorkflowGuide';
 import { FinancialCard } from '@/Components/dashboard/FinancialCard';
 import { BudgetProgress } from '@/Components/dashboard/BudgetProgress';
 import { DataTable } from '@/Components/data-table/DataTable';
@@ -30,6 +30,9 @@ type Movement = {
     department?: {
         name: string;
     } | null;
+    category?: {
+        name: string;
+    } | null;
     amount: number | string;
     status: string;
     movement_date: string;
@@ -52,6 +55,10 @@ type DashboardMetrics = {
     pendingPurchasesCount: number;
     netFlow: number | string;
     totalBudget: number | string;
+    budgetSpent: number | string;
+    goalsCurrent: number | string;
+    goalsTarget: number | string;
+    recurringCount: number;
     lowInventoryCount: number;
 };
 
@@ -90,7 +97,7 @@ const periodOptions = [
 
 const columns: ColumnDef<Movement>[] = [
     { accessorKey: 'concept', header: 'Movimiento' },
-    { accessorKey: 'department.name', header: 'Departamento', cell: ({ row }) => row.original.department?.name ?? '-' },
+    { accessorKey: 'category.name', header: 'Categoría', cell: ({ row }) => row.original.category?.name ?? '-' },
     { accessorKey: 'amount', header: 'Valor', cell: ({ row }) => <MoneyDisplay value={Number(row.original.amount)} /> },
     { accessorKey: 'status', header: 'Estado', cell: ({ row }) => <StatusBadge status={row.original.status} /> },
     { accessorKey: 'movement_date', header: 'Fecha', cell: ({ row }) => formatDate(row.original.movement_date) },
@@ -105,6 +112,10 @@ const emptyMetrics: DashboardMetrics = {
     pendingPurchasesCount: 0,
     netFlow: 0,
     totalBudget: 0,
+    budgetSpent: 0,
+    goalsCurrent: 0,
+    goalsTarget: 0,
+    recurringCount: 0,
     lowInventoryCount: 0,
 };
 
@@ -139,6 +150,11 @@ function netFlowDetail(netFlow: number) {
     return 'Ingresos y gastos equilibrados';
 }
 
+function goalsDetail(current: number, target: number) {
+    if (target <= 0) return 'Crea una meta para empezar a avanzar';
+    return `${Math.round((current / target) * 100)}% completado en tus metas activas`;
+}
+
 export default function Dashboard({
     auth,
     departments = [],
@@ -159,15 +175,13 @@ export default function Dashboard({
     superAdminMetrics?: SuperAdminMetrics;
     filters?: DashboardFilters;
 }>) {
-    const isAdmin = auth.user.roles?.some((role) => role.name === 'admin') ?? false;
-
     if (isSuperAdmin && superAdminMetrics) {
         return (
             <AppLayout user={auth.user}>
                 <Head title="Dashboard" />
 
                 <div className="mx-auto flex max-w-7xl flex-col gap-6">
-                    <PageHeader title="Panel superadmin" description="Vista global para administrar tenants, usuarios y acceso central." />
+                    <PageHeader eyebrow="Administración" title="Panel superadmin" description="Vista global para administrar clientes, usuarios y acceso central." />
 
                     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                         <FinancialCard title="Clientes activos" amount={superAdminMetrics.clients} detail="Tenants registrados en la plataforma" />
@@ -206,10 +220,12 @@ export default function Dashboard({
     const monthlyIncome = Number(metrics.monthlyIncome ?? 0);
     const previousMonthlyIncome = Number(metrics.previousMonthlyIncome ?? 0);
     const monthlyExpenses = Number(metrics.monthlyExpenses ?? 0);
-    const pendingPurchasesAmount = Number(metrics.pendingPurchasesAmount ?? 0);
-    const pendingPurchasesCount = Number(metrics.pendingPurchasesCount ?? 0);
     const netFlow = Number(metrics.netFlow ?? 0);
     const totalBudget = Number(metrics.totalBudget ?? 0);
+    const budgetSpent = Number(metrics.budgetSpent ?? 0);
+    const goalsCurrent = Number(metrics.goalsCurrent ?? 0);
+    const goalsTarget = Number(metrics.goalsTarget ?? 0);
+    const recurringCount = Number(metrics.recurringCount ?? 0);
     const lowInventoryCount = Number(metrics.lowInventoryCount ?? 0);
 
     const [periodFilter, setPeriodFilter] = useState<DashboardFilters['period']>(filters.period);
@@ -252,8 +268,9 @@ export default function Dashboard({
 
             <div className="mx-auto flex max-w-7xl flex-col gap-6">
                 <PageHeader
+                    eyebrow="Tu panorama financiero"
                     title="Dashboard financiero"
-                    description="Resumen operativo, compras pendientes, alertas e inventario critico."
+                    description="Una lectura clara de tus ingresos, gastos y decisiones pendientes."
                     actions={
                         <Button asChild>
                             <Link href="/financial-movements?create=1">Nuevo movimiento</Link>
@@ -261,17 +278,25 @@ export default function Dashboard({
                     }
                 />
 
-                {isAdmin && (
-                    <>
-                        <AdminWorkflowGuide
-                            departmentsCount={departments.length}
-                            latestMovementsCount={latestMovements.length}
-                            pendingPurchasesCount={pendingPurchasesCount}
-                            lowInventoryCount={lowInventoryCount}
-                            canManageUsers={Boolean(auth.user.roles?.some((role) => role.name === 'admin'))}
-                        />
-                    </>
-                )}
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.06, duration: 0.35 }}
+                    className="relative overflow-hidden rounded-3xl border border-emerald-300/15 bg-gradient-to-br from-emerald-400/[0.13] via-cyan-400/[0.06] to-transparent p-5 sm:p-6"
+                >
+                    <div className="pointer-events-none absolute -right-10 -top-20 h-56 w-56 rounded-full bg-cyan-300/10 blur-3xl" />
+                    <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-200/80">Lectura rápida · {filters.label}</p>
+                            <h2 className="mt-2 text-xl font-semibold tracking-tight text-white">{netFlow >= 0 ? 'Tu flujo va por buen camino.' : 'Este periodo pide atención.'}</h2>
+                            <p className="mt-1 max-w-xl text-sm text-slate-300/80">{netFlowDetail(netFlow)}. Revisa los indicadores y convierte los datos en una acción concreta.</p>
+                        </div>
+                        <div className="rounded-2xl border border-white/10 bg-slate-950/25 px-4 py-3 text-right backdrop-blur">
+                            <p className="text-xs text-muted-foreground">Balance del periodo</p>
+                            <MoneyDisplay value={netFlow} className="mt-1 block text-xl font-semibold" />
+                        </div>
+                    </div>
+                </motion.div>
 
                 <DataTableFilters>
                     <div className="space-y-2">
@@ -313,14 +338,14 @@ export default function Dashboard({
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                     <FinancialCard title="Ingresos del periodo" amount={monthlyIncome} detail={`${filters.label}. ${incomeDetail(monthlyIncome, previousMonthlyIncome)}`} />
                     <FinancialCard title="Gastos del periodo" amount={monthlyExpenses} detail={`${filters.label}. ${budgetDetail(monthlyExpenses, totalBudget)}`} />
-                    <FinancialCard title="Compras pendientes" amount={pendingPurchasesAmount} detail={`${pendingPurchasesCount} solicitudes por aprobar`} />
-                    <FinancialCard title="Flujo neto del periodo" amount={netFlow} detail={`${filters.label}. ${netFlowDetail(netFlow)}`} />
+                    <FinancialCard title="Presupuesto usado" amount={budgetSpent} detail={totalBudget > 0 ? `${Math.round((budgetSpent / totalBudget) * 100)}% de tu límite configurado` : 'Configura tu primer presupuesto'} />
+                    <FinancialCard title="Ahorro acumulado" amount={goalsCurrent} detail={goalsDetail(goalsCurrent, goalsTarget)} />
                 </div>
 
                 <Tabs defaultValue="general" className="space-y-4">
                     <TabsList>
                         <TabsTrigger value="general">General</TabsTrigger>
-                        <TabsTrigger value="departamentos">Departamentos</TabsTrigger>
+                        <TabsTrigger value="departamentos">Operación avanzada</TabsTrigger>
                         <TabsTrigger value="alertas">Alertas</TabsTrigger>
                     </TabsList>
 
@@ -390,12 +415,12 @@ export default function Dashboard({
                         <Alert>
                             <Package className="h-4 w-4" />
                             <AlertTitle>Compras pendientes</AlertTitle>
-                            <AlertDescription>{pendingPurchasesCount} solicitudes esperan aprobacion financiera.</AlertDescription>
+                            <AlertDescription>{recurringCount} movimientos recurrentes configurados para no olvidar nada.</AlertDescription>
                         </Alert>
                         <Alert>
                             <WalletCards className="h-4 w-4" />
                             <AlertTitle>{netFlow >= 0 ? 'Flujo positivo' : 'Flujo negativo'}</AlertTitle>
-                            <AlertDescription>{netFlowDetail(netFlow)}.</AlertDescription>
+                            <AlertDescription>{goalsDetail(goalsCurrent, goalsTarget)}.</AlertDescription>
                         </Alert>
                     </TabsContent>
                 </Tabs>

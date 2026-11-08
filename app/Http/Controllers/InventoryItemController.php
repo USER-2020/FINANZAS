@@ -6,6 +6,7 @@ use App\Http\Controllers\Concerns\InteractsWithTenant;
 use App\Models\InventoryItem;
 use App\Models\Department;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -28,6 +29,26 @@ class InventoryItemController extends Controller
         ]);
     }
 
+    public function image(InventoryItem $inventoryItem): SymfonyResponse
+    {
+        $request = request();
+        $this->ensureOperationalAccess($request);
+        $this->ensureSameClient($inventoryItem, $request);
+        $this->ensureOwnedByAuthenticatedUser($inventoryItem, $request);
+
+        abort_unless($inventoryItem->image_path, 404);
+        $disk = Storage::disk('local');
+        if (! $disk->exists($inventoryItem->image_path)) {
+            $disk = Storage::disk('public');
+        }
+        abort_unless($disk->exists($inventoryItem->image_path), 404);
+
+        return $disk->response($inventoryItem->image_path, null, [
+            'Cache-Control' => 'private, no-store, max-age=0',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
+    }
+
     public function store(Request $request)
     {
         $this->ensureOperationalAccess($request);
@@ -35,7 +56,7 @@ class InventoryItemController extends Controller
         unset($data['image']);
 
         if ($request->hasFile('image')) {
-            $data['image_path'] = $request->file('image')->store('inventory-items', 'public');
+            $data['image_path'] = $request->file('image')->store('inventory-items/'.$request->user()->id, 'local');
         }
 
         InventoryItem::create([
@@ -58,10 +79,11 @@ class InventoryItemController extends Controller
 
         if ($request->hasFile('image')) {
             if ($inventoryItem->image_path) {
+                Storage::disk('local')->delete($inventoryItem->image_path);
                 Storage::disk('public')->delete($inventoryItem->image_path);
             }
 
-            $data['image_path'] = $request->file('image')->store('inventory-items', 'public');
+            $data['image_path'] = $request->file('image')->store('inventory-items/'.$request->user()->id, 'local');
         }
 
         $inventoryItem->update([
@@ -80,6 +102,7 @@ class InventoryItemController extends Controller
         $this->ensureOwnedByAuthenticatedUser($inventoryItem, $request);
 
         if ($inventoryItem->image_path) {
+            Storage::disk('local')->delete($inventoryItem->image_path);
             Storage::disk('public')->delete($inventoryItem->image_path);
         }
 

@@ -99,6 +99,11 @@ class User extends Authenticatable
         return $this->hasMany(Report::class);
     }
 
+    public function tourCompletions(): HasMany
+    {
+        return $this->hasMany(TourCompletion::class);
+    }
+
     public function isSuperAdmin(): bool
     {
         return $this->hasRole('super_admin');

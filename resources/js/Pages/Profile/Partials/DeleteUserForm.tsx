@@ -1,7 +1,7 @@
 import { useRef, useState, FormEventHandler } from 'react';
 import InputError from '@/Components/InputError';
 import { Button } from '@/Components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
+import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
 import { Input } from '@/Components/ui/input';
 import { useForm } from '@inertiajs/react';
 
@@ -55,7 +55,7 @@ export default function DeleteUserForm({ className = '' }: { className?: string 
 
             <Dialog open={confirmingUserDeletion} onOpenChange={(open) => (open ? setConfirmingUserDeletion(true) : closeModal())}>
                 <DialogContent>
-                    <form onSubmit={deleteUser} className="space-y-5">
+                    <form onSubmit={deleteUser} className="flex min-h-0 flex-1 flex-col gap-5">
                         <DialogHeader>
                             <DialogTitle>Confirmar eliminacion</DialogTitle>
                             <DialogDescription>
@@ -63,21 +63,23 @@ export default function DeleteUserForm({ className = '' }: { className?: string 
                             </DialogDescription>
                         </DialogHeader>
 
-                        <div className="space-y-2">
-                            <label htmlFor="password" className="text-sm font-medium text-white">Contraseña</label>
-                            <Input
-                            id="password"
-                            type="password"
-                            name="password"
-                            ref={contraseñaInput}
-                            value={data.password}
-                            onChange={(e) => setData('password', e.target.value)}
-                            autoFocus
-                            placeholder="Contraseña"
-                            />
+                        <DialogBody>
+                            <div className="space-y-2">
+                                <label htmlFor="password" className="text-sm font-medium text-white">Contraseña</label>
+                                <Input
+                                id="password"
+                                type="password"
+                                name="password"
+                                ref={contraseñaInput}
+                                value={data.password}
+                                onChange={(e) => setData('password', e.target.value)}
+                                autoFocus
+                                placeholder="Contraseña"
+                                />
 
-                            <InputError message={errors.password} />
-                        </div>
+                                <InputError message={errors.password} />
+                            </div>
+                        </DialogBody>
 
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={closeModal}>Cancelar</Button>

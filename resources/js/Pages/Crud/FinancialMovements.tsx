@@ -5,10 +5,12 @@ import { DataTableFilters } from '@/Components/data-table/DataTableFilters';
 import { DateTimePicker } from '@/Components/shared/DateTimePicker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { PageProps } from '@/types';
+import { InvoiceScanner } from '@/Components/invoices/InvoiceScanner';
 
 type Props = PageProps<{
     movements: ResourceRow[];
     departments: ResourceRow[];
+    categories: ResourceRow[];
     paymentMethods: ResourceRow[];
 }>;
 
@@ -23,22 +25,26 @@ const periodOptions = [
 
 type PeriodFilter = (typeof periodOptions)[number]['value'];
 
-export default function FinancialMovements({ auth, movements, departments, paymentMethods }: Props) {
+export default function FinancialMovements({ auth, movements, departments, categories, paymentMethods }: Props) {
     const [periodFilter, setPeriodFilter] = useState<PeriodFilter>('all');
     const [dateFrom, setDateFrom] = useState('');
     const [dateTo, setDateTo] = useState('');
+    const openScannerFromMenu = new URLSearchParams(window.location.search).get('scan') === '1';
 
     const departmentOptions = departments.map((department) => ({ label: department.name, value: String(department.id) }));
+    const categoryOptions = categories.map((category) => ({ label: category.name, value: String(category.id) }));
     const paymentMethodOptions = paymentMethods.map((paymentMethod) => ({ label: paymentMethod.name, value: paymentMethod.code }));
 
     const fields: ResourceField[] = [
         { name: 'concept', label: 'Concepto', required: true },
+        { name: 'category_id', label: 'Categoría', type: 'select', options: categoryOptions },
         { name: 'department_id', label: 'Departamento', type: 'select', options: departmentOptions },
         { name: 'type', label: 'Tipo', type: 'select', required: true, defaultValue: 'Ingreso', options: ['Ingreso', 'Gasto'].map((value) => ({ label: value, value })) },
         { name: 'amount', label: 'Valor', type: 'number', required: true },
         { name: 'movement_date', label: 'Fecha', type: 'date', required: true },
         { name: 'status', label: 'Estado', type: 'select', required: true, options: statuses.map((value) => ({ label: value, value })) },
         { name: 'payment_method', label: 'Medio de pago', type: 'select', options: paymentMethodOptions },
+        { name: 'account', label: 'Cuenta o billetera' },
         { name: 'image', label: 'Imagen', type: 'file', accept: 'image/*', previewKey: 'image_url' },
         { name: 'description', label: 'Descripción', type: 'textarea' },
     ];
@@ -47,6 +53,7 @@ export default function FinancialMovements({ auth, movements, departments, payme
         { key: 'image_url', header: 'Imagen', type: 'image' },
         { key: 'concept', header: 'Movimiento' },
         { key: 'department.name', header: 'Departamento' },
+        { key: 'category.name', header: 'Categoría' },
         { key: 'type', header: 'Tipo' },
         { key: 'amount', header: 'Valor', type: 'money' },
         { key: 'status', header: 'Estado', type: 'status' },
@@ -146,6 +153,7 @@ export default function FinancialMovements({ auth, movements, departments, payme
             storeUrl="/financial-movements"
             resourceUrl="/financial-movements"
             searchPlaceholder="Buscar movimientos..."
+            headerActions={<InvoiceScanner categories={categories} initialOpen={openScannerFromMenu} />}
             tableToolbar={tableToolbar}
         />
     );

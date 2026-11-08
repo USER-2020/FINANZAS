@@ -1,5 +1,6 @@
 import { FormEvent, ReactNode, useEffect, useMemo, useState } from 'react';
 import { Head, router, useForm } from '@inertiajs/react';
+import { motion } from 'framer-motion';
 import { type CellContext, type ColumnDef } from '@tanstack/react-table';
 import { Edit, Image, Plus, Trash2 } from 'lucide-react';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
@@ -13,11 +14,12 @@ import { StatusBadge } from '@/Components/shared/StatusBadge';
 import { DateTimePicker } from '@/Components/shared/DateTimePicker';
 import { Button } from '@/Components/ui/button';
 import { Checkbox } from '@/Components/ui/checkbox';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
+import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
 import { Input } from '@/Components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { Switch } from '@/Components/ui/switch';
 import { Textarea } from '@/Components/ui/textarea';
+import { Card, CardContent } from '@/Components/ui/card';
 import { formatDate, formatNumericInput, formatDateTimeInput, parseNumericInput } from '@/lib/format';
 import { PageProps } from '@/types';
 
@@ -379,21 +381,34 @@ export default function ResourceIndex({
                     }
                 />
 
-                <DataTable columns={tableColumns} data={items} searchPlaceholder={searchPlaceholder} toolbarContent={tableToolbar} />
+                <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}>
+                    <Card className="overflow-hidden">
+                        <div className="flex flex-col gap-2 border-b border-white/[0.07] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-white">Registros</p>
+                                <p className="text-xs text-muted-foreground">{items.length} {items.length === 1 ? 'registro disponible' : 'registros disponibles'}</p>
+                            </div>
+                            <div className="text-xs text-muted-foreground">Busca, filtra y administra desde aquí</div>
+                        </div>
+                        <CardContent className="p-5">
+                            <DataTable columns={tableColumns} data={items} searchPlaceholder={searchPlaceholder} toolbarContent={tableToolbar} />
+                        </CardContent>
+                    </Card>
+                </motion.div>
             </div>
 
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent
-                    className="max-h-[90vh] overflow-y-auto sm:max-w-2xl"
-                    onInteractOutside={(event) => event.preventDefault()}
+                    className="sm:max-w-2xl"
                 >
-                    <form onSubmit={submit} className="space-y-5">
+                    <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col gap-5">
                         <DialogHeader>
                             <DialogTitle>{editing ? 'Editar registro' : 'Nuevo registro'}</DialogTitle>
                             <DialogDescription>Completa los datos y guarda los cambios.</DialogDescription>
                         </DialogHeader>
 
-                        <div className="grid gap-4 sm:grid-cols-2">
+                        <DialogBody>
+                        <div className="grid gap-4 px-0.5 sm:grid-cols-2">
                             {fields
                                 .filter((field) => !field.hidden)
                                 .map((field) => (
@@ -532,6 +547,7 @@ export default function ResourceIndex({
                                 </label>
                             ))}
                         </div>
+                        </DialogBody>
 
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setOpen(false)}>

@@ -36,6 +36,10 @@ class RolesAndUsersSeeder extends Seeder
             'inventory-items',
             'reports',
             'users',
+            'budgets',
+            'savings-goals',
+            'recurring-transactions',
+            'categories',
         ];
 
         $actions = ['view', 'create', 'update', 'delete'];

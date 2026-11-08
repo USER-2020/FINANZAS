@@ -1,10 +1,13 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="512" height="512" rx="132" fill="#07131B"/>
-  <rect x="24" y="24" width="464" height="464" rx="108" fill="url(#bg)" stroke="rgba(125,211,252,0.24)" stroke-width="8"/>
-  <circle cx="410" cy="102" r="28" fill="#10B981" fill-opacity="0.22"/>
-  <circle cx="114" cy="420" r="44" fill="#06B6D4" fill-opacity="0.14"/>
-  <path d="M136 324L228 232L268 272L376 164" stroke="#E0F2FE" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M318 164H376V222" stroke="#22D3EE" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect width="512" height="512" rx="132" fill="#06111F"/>
+  <rect x="24" y="24" width="464" height="464" rx="108" fill="url(#bg)" stroke="#54E5D1" stroke-opacity=".25" stroke-width="8"/>
+  <circle cx="404" cy="98" r="30" fill="#19CFAE" fill-opacity=".18"/>
+  <circle cx="108" cy="416" r="54" fill="#25D3EE" fill-opacity=".12"/>
+  <path d="M126 202C126 186.536 138.536 174 154 174H358C373.464 174 386 186.536 386 202V354C386 369.464 373.464 382 358 382H154C138.536 382 126 369.464 126 354V202Z" fill="#0B2433" stroke="#B9FFF2" stroke-width="22"/>
+  <path d="M126 222H386" stroke="#25D3EE" stroke-width="22"/>
+  <path d="M312 270H386V326H312C296.536 326 284 313.464 284 298C284 282.536 296.536 270 312 270Z" fill="#19CFAE" fill-opacity=".88" stroke="#B9FFF2" stroke-width="14"/>
+  <circle cx="316" cy="298" r="8" fill="#06111F"/>
+  <path d="M176 174V154C176 138.536 188.536 126 204 126H308C323.464 126 336 138.536 336 154V174" stroke="#25D3EE" stroke-width="22" stroke-linecap="round"/>
   <defs>
     <linearGradient id="bg" x1="60" y1="40" x2="430" y2="468" gradientUnits="userSpaceOnUse">
       <stop stop-color="#123042"/>

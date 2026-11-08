@@ -5,26 +5,26 @@
 @layer base {
     :root {
         color-scheme: dark;
-        --background: 204 43% 7%;
+        --background: 222 47% 7%;
         --foreground: 210 40% 96%;
-        --card: 205 34% 11%;
+        --card: 222 38% 11%;
         --card-foreground: 0 0% 100%;
-        --popover: 205 34% 11%;
+        --popover: 222 38% 12%;
         --popover-foreground: 0 0% 100%;
-        --primary: 196 84% 46%;
-        --primary-foreground: 0 0% 100%;
-        --secondary: 201 44% 18%;
+        --primary: 160 84% 46%;
+        --primary-foreground: 222 47% 7%;
+        --secondary: 222 32% 18%;
         --secondary-foreground: 0 0% 100%;
-        --muted: 206 23% 18%;
-        --muted-foreground: 210 18% 72%;
-        --accent: 153 60% 45%;
+        --muted: 222 26% 18%;
+        --muted-foreground: 215 20% 70%;
+        --accent: 187 80% 52%;
         --accent-foreground: 210 40% 98%;
         --destructive: 0 68% 54%;
         --destructive-foreground: 0 0% 100%;
         --border: 0 0% 100% / 0.08;
         --input: 0 0% 100% / 0.08;
-        --ring: 196 84% 46%;
-        --radius: 0.65rem;
+        --ring: 160 84% 46%;
+        --radius: 0.85rem;
     }
 
     * {
@@ -32,22 +32,22 @@
     }
 
     html {
-        background: #07131b;
+        background: #0a1020;
         -webkit-text-size-adjust: 100%;
         text-size-adjust: 100%;
-        touch-action: manipulation;
+        touch-action: pan-x pan-y;
         overscroll-behavior: none;
     }
 
     body {
         @apply bg-background text-foreground antialiased;
         background:
-            radial-gradient(circle at top left, rgba(14, 165, 233, 0.22), transparent 32rem),
-            radial-gradient(circle at top right, rgba(16, 185, 129, 0.14), transparent 28rem),
-            linear-gradient(180deg, rgba(7, 19, 27, 0.98), rgba(10, 24, 35, 1)),
-            #07131b;
+            radial-gradient(circle at 8% -10%, rgba(45, 212, 191, 0.16), transparent 26rem),
+            radial-gradient(circle at 100% 0%, rgba(56, 189, 248, 0.13), transparent 28rem),
+            linear-gradient(180deg, #0a1020 0%, #0c1425 100%);
         overscroll-behavior: none;
         -webkit-tap-highlight-color: transparent;
+        touch-action: pan-x pan-y;
         padding-top: env(safe-area-inset-top);
         padding-right: env(safe-area-inset-right);
         padding-bottom: env(safe-area-inset-bottom);
@@ -64,12 +64,83 @@
 
 @layer components {
     .brand-card {
-        @apply border border-white/10 bg-[#10212d]/85 shadow-xl shadow-black/30 backdrop-blur;
+        @apply border border-white/[0.08] bg-slate-950/40 shadow-[0_18px_50px_rgba(2,6,23,0.22)] backdrop-blur-xl;
     }
 
     .brand-button {
-        @apply bg-gradient-to-r from-[#0891b2] to-[#10b981] text-white shadow-lg shadow-[#0891b2]/20 hover:from-[#06b6d4] hover:to-[#34d399];
+        @apply bg-gradient-to-r from-emerald-400 to-cyan-400 text-slate-950 shadow-lg shadow-emerald-500/20 hover:from-emerald-300 hover:to-cyan-300;
     }
+
+    .surface-grid {
+        background-image: linear-gradient(rgba(148, 163, 184, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(148, 163, 184, 0.035) 1px, transparent 1px);
+        background-size: 32px 32px;
+        mask-image: linear-gradient(to bottom, black, transparent 85%);
+    }
+
+    .module-kicker {
+        @apply text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-emerald-300/80;
+    }
+
+    .dialog-sheet-handle {
+        display: none;
+    }
+}
+
+@media (max-width: 639px) {
+    input,
+    select,
+    textarea {
+        /* iOS Safari zooms focused controls below 16px. */
+        font-size: 16px !important;
+    }
+
+    .responsive-dialog-content {
+        left: 0;
+        right: 0;
+        top: auto;
+        bottom: 0;
+        width: 100%;
+        max-width: none;
+        max-height: 92dvh;
+        overflow: hidden;
+        transform: none;
+        border-radius: 2rem 2rem 0 0;
+        padding: 1.25rem;
+        padding-bottom: calc(1.25rem + env(safe-area-inset-bottom));
+        animation: finanzas-sheet-in 280ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .responsive-dialog-content[data-state='closed'] {
+        animation: finanzas-sheet-out 180ms ease-in forwards;
+    }
+
+    .dialog-sheet-handle {
+        display: block;
+        touch-action: none;
+    }
+
+    .dialog-sheet-body {
+        -webkit-overflow-scrolling: touch;
+        scrollbar-gutter: stable;
+    }
+
+    .responsive-dialog-content[data-sheet-expanded='true'] {
+        top: 0;
+        bottom: 0;
+        max-height: 100dvh;
+        border-radius: 0;
+        padding-top: calc(1.25rem + env(safe-area-inset-top));
+    }
+}
+
+@keyframes finanzas-sheet-in {
+    from { opacity: 0; transform: translateY(100%); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes finanzas-sheet-out {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(100%); }
 }
 
 .react-phone-container {
@@ -119,4 +190,55 @@
     background: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     color: white !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+.driver-popover {
+    z-index: 10001 !important;
+    border: 1px solid rgba(52, 211, 153, 0.28) !important;
+    border-radius: 1rem !important;
+    background: #101b2d !important;
+    color: #f8fafc !important;
+    box-shadow: 0 24px 70px rgba(2, 6, 23, 0.45) !important;
+}
+
+.driver-popover-title {
+    color: #f8fafc !important;
+    font-size: 1rem;
+}
+
+.driver-popover-description {
+    color: #a8b5c8 !important;
+    line-height: 1.55;
+}
+
+.driver-popover-progress-text {
+    color: #6ee7b7 !important;
+}
+
+.driver-popover-next-btn,
+.driver-popover-done-btn {
+    border: 0 !important;
+    border-radius: 0.7rem !important;
+    background: linear-gradient(90deg, #34d399, #22d3ee) !important;
+    color: #07131b !important;
+    font-weight: 700;
+    text-shadow: none;
+}
+
+.driver-popover-prev-btn {
+    border-radius: 0.7rem !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: #cbd5e1 !important;
+    background: rgba(255, 255, 255, 0.05) !important;
 }

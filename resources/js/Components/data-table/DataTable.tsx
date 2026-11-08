@@ -4,6 +4,7 @@ import { DataTableToolbar } from '@/Components/data-table/DataTableToolbar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { SearchInput } from '@/Components/shared/SearchInput';
 import { EmptyState } from '@/Components/shared/EmptyState';
+import { motion } from 'framer-motion';
 
 function columnLabel<TData, TValue>(cell: { column: { id: string; columnDef: ColumnDef<TData, TValue> } }) {
     const header = cell.column.columnDef.header;
@@ -53,7 +54,7 @@ export function DataTable<TData, TValue>({
                         const detailCells = dataCells.slice(1);
 
                         return (
-                            <article key={row.id} className="rounded-lg border border-white/10 bg-white/[0.03] p-4 shadow-lg shadow-black/20">
+                            <motion.article initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} key={row.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 shadow-lg shadow-black/20">
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="min-w-0">
                                         <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">
@@ -84,7 +85,7 @@ export function DataTable<TData, TValue>({
                                         ))}
                                     </div>
                                 )}
-                            </article>
+                            </motion.article>
                         );
                     })
                 ) : (
@@ -94,7 +95,7 @@ export function DataTable<TData, TValue>({
                 )}
             </div>
 
-            <div className="hidden rounded-lg border border-white/10 md:block">
+            <div className="hidden overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.015] md:block">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -110,11 +111,11 @@ export function DataTable<TData, TValue>({
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id}>
+                                <motion.tr initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }} key={row.id} className="border-b border-white/[0.06] transition-colors hover:bg-white/[0.03]">
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                                     ))}
-                                </TableRow>
+                                </motion.tr>
                             ))
                         ) : (
                             <TableRow>

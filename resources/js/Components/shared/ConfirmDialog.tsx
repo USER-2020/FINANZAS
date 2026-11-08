@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { Button } from '@/Components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/Components/ui/dialog';
+import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/Components/ui/dialog';
 
 export function ConfirmDialog({ trigger, title, description, onConfirm }: { trigger: ReactNode; title: string; description?: string; onConfirm: () => void }) {
     return (
@@ -11,6 +11,7 @@ export function ConfirmDialog({ trigger, title, description, onConfirm }: { trig
                     <DialogTitle>{title}</DialogTitle>
                     {description && <DialogDescription>{description}</DialogDescription>}
                 </DialogHeader>
+                <DialogBody />
                 <DialogFooter>
                     <Button variant="outline">Cancelar</Button>
                     <Button onClick={onConfirm}>Confirmar</Button>

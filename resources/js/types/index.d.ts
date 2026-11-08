@@ -26,6 +26,11 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
         user: User;
         navigation?: NavigationItem[];
     };
+    tourCompletions?: Array<{
+        tour_key: string;
+        version: string;
+        completed_at?: string;
+    }>;
     flash?: {
         success?: string | null;
         error?: string | null;
