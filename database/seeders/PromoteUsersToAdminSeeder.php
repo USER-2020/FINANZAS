@@ -9,7 +9,8 @@ use Spatie\Permission\Models\Role;
 class PromoteUsersToAdminSeeder extends Seeder
 {
     /**
-     * Assign the admin role to every user except super admins and accountants.
+     * Assign the admin role and full tenant menu access to every user except
+     * super admins and accountants.
      */
     public function run(): void
     {
@@ -25,6 +26,9 @@ class PromoteUsersToAdminSeeder extends Seeder
             ->get();
 
         $users->each(function (User $user) use ($adminRole): void {
+            $user->update([
+                'menu_access' => null,
+            ]);
             $user->syncRoles([$adminRole]);
         });
 
